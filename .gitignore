@@ -1,0 +1,6 @@
+*.*/libft
+a.out
+pipex
+*.*/.vscode
+*test.txt
+
