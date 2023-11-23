@@ -1,5 +1,7 @@
 a.out
 pipex
-*.*/.vscode
+.vscode/*
 *test.txt
+.DS_Store
+*.txt
 
