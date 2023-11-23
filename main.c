@@ -6,7 +6,7 @@
 /*   By: aldokezer <aldokezer@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:22:40 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/23 18:46:42 by aldokezer        ###   ########.fr       */
+/*   Updated: 2023/11/23 19:02:57 by aldokezer        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,7 @@ int	main(int argc, char *argv[])
 		pid2 = fork();
 		if (pid2 == -1)
 			return (1);
-		// subchild process execution a child of the child process
+		// subchild process execution a child of the child process executes in parallel with the child process
 		if (pid2 == 0)
 		{
 			// this was crazy! 3 hours of debugging and it was just a close() missing
