@@ -6,7 +6,7 @@
 /*   By: aldokezer <aldokezer@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:22:40 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/24 18:33:04 by aldokezer        ###   ########.fr       */
+/*   Updated: 2023/11/24 20:49:45 by aldokezer        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,6 +101,7 @@ int	main(int argc, char *argv[])
 			close(pipe_fd[0]);
 			close(pipe_fd[1]);
 			close(pipe_fd[3]);
+			close(input_fd);
 			close(output_fd);
 			char *wc_args[] = { "wc", "-lwc", NULL };
 			execve("/usr/bin/wc", wc_args, NULL);
@@ -110,10 +111,12 @@ int	main(int argc, char *argv[])
 		else
 		{
 
-			dup2(pipe_fd[0], STDIN_FILENO);
+			//dup2(pipe_fd[0], STDIN_FILENO);
+			dup2(input_fd, STDIN_FILENO);
 			// connect the pipe from the child process to the write end of the pipe of the subchild process
 			dup2(pipe_fd[3], STDOUT_FILENO);
 			//- no longer needed
+			close(input_fd);
 			close(pipe_fd[0]);
 			close(pipe_fd[1]);
 			close(pipe_fd[2]);
@@ -128,15 +131,7 @@ int	main(int argc, char *argv[])
 // (pid == 0) is the child process
 	else
 	{
-        char buffer[1];
-		// initialize bytes_read
-        ssize_t bytes_read;
-		// read input_fd and write to pipe_fd[1]
-        while ((bytes_read = read(input_fd, buffer, 1)) > 0)
-		{
-            write(pipe_fd[1], buffer, bytes_read);
-        }
-		// close all file descriptors that are not needed
+		// // close all file descriptors that are not needed
         close(input_fd);
         close(pipe_fd[1]);
 		close(pipe_fd[0]);
