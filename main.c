@@ -6,7 +6,7 @@
 /*   By: aldokezer <aldokezer@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:22:40 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/24 18:15:25 by aldokezer        ###   ########.fr       */
+/*   Updated: 2023/11/24 18:33:04 by aldokezer        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,13 +95,12 @@ int	main(int argc, char *argv[])
 			// lesson learned: close all file descriptors that are not needed
 			// the child process inherits all file descriptors from the parent processes
 			// so you must close ALL ALL ALL!!
+			dup2(pipe_fd[2], STDIN_FILENO);
+			dup2(output_fd, STDOUT_FILENO);
+			close(pipe_fd[2]);
 			close(pipe_fd[0]);
 			close(pipe_fd[1]);
 			close(pipe_fd[3]);
-			dup2(pipe_fd[2], STDIN_FILENO);
-			//ft_print_from_fd(pipe_fd2[0]);
-			close(pipe_fd[2]);
-			dup2(output_fd, STDOUT_FILENO);
 			close(output_fd);
 			char *wc_args[] = { "wc", "-lwc", NULL };
 			execve("/usr/bin/wc", wc_args, NULL);
@@ -110,18 +109,14 @@ int	main(int argc, char *argv[])
 		// child of the main process
 		else
 		{
-			// close pipe_fd[1] - not needed for writing in the child process to the main process
-			close(pipe_fd[1]);
-			close(pipe_fd[2]);
-			// connect the pipe from the main process to the stdin of the child process (ls)
-			//ft_print_from_fd(pipe_fd[0]);
+
 			dup2(pipe_fd[0], STDIN_FILENO);
-			//- no longer needed
-			close(pipe_fd[0]);
 			// connect the pipe from the child process to the write end of the pipe of the subchild process
 			dup2(pipe_fd[3], STDOUT_FILENO);
-			//ft_putnbr_fd(dup2(output_fd, STDOUT_FILENO), 1);
-			//close(output_fd);
+			//- no longer needed
+			close(pipe_fd[0]);
+			close(pipe_fd[1]);
+			close(pipe_fd[2]);
 			close(pipe_fd[3]);
 			// execute command
 			char *wc_argss[] = { "cat", NULL };
@@ -133,11 +128,6 @@ int	main(int argc, char *argv[])
 // (pid == 0) is the child process
 	else
 	{
-		// close pipe_fd[0] - not needed for reading in the parent process
-		close(pipe_fd[0]);
-		close(pipe_fd[2]);
-		close(pipe_fd[3]);
-		// initialize buffer
         char buffer[1];
 		// initialize bytes_read
         ssize_t bytes_read;
@@ -146,9 +136,12 @@ int	main(int argc, char *argv[])
 		{
             write(pipe_fd[1], buffer, bytes_read);
         }
-		// close input_fd and pipe_fd[1] - no longer needed
+		// close all file descriptors that are not needed
         close(input_fd);
         close(pipe_fd[1]);
+		close(pipe_fd[0]);
+		close(pipe_fd[2]);
+		close(pipe_fd[3]);
 // wait for child process to finish
         waitpid(pid, NULL, 0);
 	}
