@@ -6,7 +6,7 @@
 /*   By: aldokezer <aldokezer@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:22:40 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/24 20:49:45 by aldokezer        ###   ########.fr       */
+/*   Updated: 2023/11/25 00:51:28 by aldokezer        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,14 @@ int	main(int argc, char *argv[])
 	int	no_of_commands;
 	int	pipe_fd[2 * (argc - 3)];
 	int pid;
+	int process;
 
+// argument check
+	if (argc != 6)
+	{
+		ft_putstr_fd("Usage: ./pipex file1 cmd1 cmd2 file2", 2);
+		return (1);
+	}
 	no_of_commands = argc - 3;
 // create pipes for each command
 	int i = 0;
@@ -54,12 +61,6 @@ int	main(int argc, char *argv[])
 	{
 		if (pipe(pipe_fd + (i++ * 2)) == -1)
 			return (1);
-	}
-// argument check
-	if (argc != 5)
-	{
-		ft_putstr_fd("Usage: ./pipex file1 cmd1 cmd2 file2", 2);
-		return (1);
 	}
 // file check of the first argument
 	if (!ft_is_file_valid(argv[1]))
@@ -71,74 +72,115 @@ int	main(int argc, char *argv[])
 	}
 // create input and output file descriptors
 	input_fd = open(argv[1], O_RDONLY);
-	output_fd = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	output_fd = open(argv[5], O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (output_fd == -1)
 		return (1);
-
-// create child process
-	pid = fork();
-// check if fork failed
-	if (pid == -1)
-		return (1);
-// child process execution
-	if (pid == 0)
+	process = 0;
+	while(process < no_of_commands)
 	{
-		int pid2;
-		// create subchild process
-		pid2 = fork();
-		if (pid2 == -1)
+		pid = fork();
+		if (pid == -1)
 			return (1);
-		// subchild process execution a child of the child process executes in parallel with the child process
-		if (pid2 == 0)
+		if (pid == 0)
 		{
-			// this was crazy! 3 hours of debugging and it was just a close() missing
-			// lesson learned: close all file descriptors that are not needed
-			// the child process inherits all file descriptors from the parent processes
-			// so you must close ALL ALL ALL!!
-			dup2(pipe_fd[2], STDIN_FILENO);
-			dup2(output_fd, STDOUT_FILENO);
-			close(pipe_fd[2]);
+			if (process == 0)
+			{
+				dup2(input_fd, STDIN_FILENO);
+				dup2(pipe_fd[process * 2 + 1], STDOUT_FILENO);
+			}
+			if (process > 0 && process < no_of_commands - 1)
+			{
+				dup2(pipe_fd[process * 2 - 2], STDIN_FILENO);
+				dup2(pipe_fd[process * 2 + 1], STDOUT_FILENO);
+			}
+			if (process == no_of_commands - 1)
+			{
+				dup2(pipe_fd[process * 2 - 2], STDIN_FILENO);
+				dup2(output_fd, STDOUT_FILENO);
+			}
 			close(pipe_fd[0]);
 			close(pipe_fd[1]);
+			close(pipe_fd[2]);
 			close(pipe_fd[3]);
-			close(input_fd);
+			close(pipe_fd[4]);
+			close(pipe_fd[5]);
 			close(output_fd);
-			char *wc_args[] = { "wc", "-lwc", NULL };
-			execve("/usr/bin/wc", wc_args, NULL);
-		}
-		// child process execution
-		// child of the main process
-		else
-		{
-
-			//dup2(pipe_fd[0], STDIN_FILENO);
-			dup2(input_fd, STDIN_FILENO);
-			// connect the pipe from the child process to the write end of the pipe of the subchild process
-			dup2(pipe_fd[3], STDOUT_FILENO);
-			//- no longer needed
 			close(input_fd);
-			close(pipe_fd[0]);
-			close(pipe_fd[1]);
-			close(pipe_fd[2]);
-			close(pipe_fd[3]);
-			// execute command
 			char *wc_argss[] = { "cat", NULL };
 			execve("/bin/cat", wc_argss, NULL);
-			waitpid(pid2, NULL, 0);
 		}
+		else
+		{
+			close(pipe_fd[1]);
+			waitpid(pid, NULL, 0);
+		}
+		process++;
 	}
-// parent process execution - executes in parallel with child process!
-// (pid == 0) is the child process
-	else
-	{
-		// // close all file descriptors that are not needed
-        close(input_fd);
-        close(pipe_fd[1]);
-		close(pipe_fd[0]);
-		close(pipe_fd[2]);
-		close(pipe_fd[3]);
-// wait for child process to finish
-        waitpid(pid, NULL, 0);
-	}
-	return (0);
+
+// // create child process
+// 	pid = fork();
+// // check if fork failed
+// 	if (pid == -1)
+// 		return (1);
+// // child process execution
+// 	if (pid == 0)
+// 	{
+// 		int pid2;
+// 		// create subchild process
+// 		pid2 = fork();
+// 		if (pid2 == -1)
+// 			return (1);
+// 		// subchild process execution a child of the child process executes in parallel with the child process
+// 		if (pid2 == 0)
+// 		{
+// 			// this was crazy! 3 hours of debugging and it was just a close() missing
+// 			// lesson learned: close all file descriptors that are not needed
+// 			// the child process inherits all file descriptors from the parent processes
+// 			// so you must close ALL ALL ALL!!
+// 			dup2(pipe_fd[2], STDIN_FILENO);
+// 			dup2(output_fd, STDOUT_FILENO);
+// 			close(pipe_fd[2]);
+// 			close(pipe_fd[0]);
+// 			close(pipe_fd[1]);
+// 			close(pipe_fd[3]);
+// 			close(input_fd);
+// 			close(output_fd);
+// 			char *wc_args[] = { "wc", "-lwc", NULL };
+// 			execve("/usr/bin/wc", wc_args, NULL);
+// 		}
+// 		// child process execution
+// 		// child of the main process
+// 		else
+// 		{
+
+// 			//dup2(pipe_fd[0], STDIN_FILENO);
+// 			dup2(input_fd, STDIN_FILENO);
+// 			// connect the pipe from the child process to the write end of the pipe of the subchild process
+// 			dup2(pipe_fd[3], STDOUT_FILENO);
+// 			//- no longer needed
+// 			close(input_fd);
+// 			close(pipe_fd[0]);
+// 			close(pipe_fd[1]);
+// 			close(pipe_fd[2]);
+// 			close(pipe_fd[3]);
+// 			// execute command
+// 			char *wc_argss[] = { "cat", NULL };
+// 			execve("/bin/cat", wc_argss, NULL);
+// 			waitpid(pid2, NULL, 0);
+// 		}
+// 	}
+// // parent process execution - executes in parallel with child process!
+// // (pid == 0) is the child process
+// 	else
+// 	{
+// 		// // close all file descriptors that are not needed
+//      close(input_fd);
+//      close(pipe_fd[1]);
+// 		close(pipe_fd[0]);
+// 		close(pipe_fd[2]);
+// 		close(pipe_fd[3]);
+// // wait for child process to finish
+//         waitpid(pid, NULL, 0);
+// 	}
+// 	return (0);
 }
