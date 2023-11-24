@@ -6,7 +6,7 @@
 /*   By: aldokezer <aldokezer@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:22:40 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/23 19:02:57 by aldokezer        ###   ########.fr       */
+/*   Updated: 2023/11/24 17:43:39 by aldokezer        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,7 @@ int	main(int argc, char *argv[])
 			close(pipe_fd2[0]);
 			dup2(output_fd, STDOUT_FILENO);
 			close(output_fd);
-			char *wc_args[] = { "wc", NULL };
+			char *wc_args[] = { "wc", "-lwc", NULL };
 			execve("/usr/bin/wc", wc_args, NULL);
 		}
 		// child process execution
