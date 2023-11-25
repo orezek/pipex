@@ -6,7 +6,7 @@
 /*   By: aldokezer <aldokezer@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:22:40 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/25 10:27:50 by aldokezer        ###   ########.fr       */
+/*   Updated: 2023/11/26 00:07:50 by aldokezer        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 
 int	ft_is_file_valid(const char *filename)
 {
-	if (access(filename, F_OK | R_OK) == 0)
+	if (access(filename, R_OK) == 0)
 		return (1);
 	return (0);
 }
@@ -33,11 +33,72 @@ void ft_print_from_fd(int fd)
 	}
 }
 
-// child process is a duplicate of the parent process until execve() is called
-// forked process iherits all from the main process the same applies to child processes and its children
-// forked process has its own copy of the variables and file descriptors, the file descriptors
-// are not shared between the parent and the child process and need to be manually closed when not needed!!!
-// the child process can write to the pipe and the parent process can read from the pipe and vice versa
+char	**ft_get_paths(char *envp[])
+{
+	int		i = 0;
+	char	*path;
+
+	while (envp[i] != NULL)
+	{
+		if (ft_strncmp(envp[i], "PATH=", 5) == 0)
+			path = envp[i] + 5;
+		i++;
+	}
+	return (ft_split(path, ':'));
+}
+// return path to command if the command exists
+char	*ft_get_command_path(char *envp[], char *cmd_arg)
+{
+	char	*cmd_path;
+	char	**paths;
+	char	**cmd_name;
+	char	*tmp_path;
+	char	**ptr_paths;
+
+	cmd_name = ft_split(cmd_arg, ' ');
+	paths = ft_get_paths(envp);
+	ptr_paths = paths;
+	while (*paths)
+	{
+		tmp_path = ft_strjoin(*paths, "/");
+		cmd_path = ft_strjoin(tmp_path, cmd_name[0]);
+		free(tmp_path);
+		if (ft_is_file_valid(cmd_path))
+				return (free(ptr_paths), free(cmd_name), cmd_path);
+		paths++;
+	}
+	return (free(ptr_paths), free(cmd_name), free(cmd_path), NULL);
+}
+
+// Execute process
+int	ft_exec_cmd(char *path, char *cmd_arg)
+{
+	char	**commands;
+
+	commands = ft_split(cmd_arg, ' ');
+	if (execve(path, commands, NULL) == -1)
+		return (free(commands), -1);
+	return (free(commands), 0);
+}
+int main(int argc, char *argv[], char *envp[])
+{
+	char	**paths;
+	int		no_of_commands;
+	int		i;
+
+
+	no_of_commands = argc - 3;
+	i = 0;
+	while (i < no_of_commands)
+	{
+		ft_printf("%s\n", ft_get_command_path(envp, argv[i + 2]));
+		i++;
+	}
+
+
+    return 0;
+}
+
 
 int	main(int argc, char *argv[])
 {
