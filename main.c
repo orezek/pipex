@@ -6,7 +6,7 @@
 /*   By: aldokezer <aldokezer@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:22:40 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/26 00:07:50 by aldokezer        ###   ########.fr       */
+/*   Updated: 2023/11/26 00:28:13 by aldokezer        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,27 +80,8 @@ int	ft_exec_cmd(char *path, char *cmd_arg)
 		return (free(commands), -1);
 	return (free(commands), 0);
 }
-int main(int argc, char *argv[], char *envp[])
-{
-	char	**paths;
-	int		no_of_commands;
-	int		i;
 
-
-	no_of_commands = argc - 3;
-	i = 0;
-	while (i < no_of_commands)
-	{
-		ft_printf("%s\n", ft_get_command_path(envp, argv[i + 2]));
-		i++;
-	}
-
-
-    return 0;
-}
-
-
-int	main(int argc, char *argv[])
+int	main(int argc, char *argv[], char *envp[])
 {
 	int	input_fd;
 	int	output_fd;
@@ -164,15 +145,19 @@ int	main(int argc, char *argv[])
 				close(pipe_fd[i++]);// close all pipes
 			close(output_fd);
 			close(input_fd);
-			char *wc_argss[] = { "cat", NULL };
-			execve("/bin/cat", wc_argss, NULL);
+			char *path = ft_get_command_path(envp, argv[process + 2]);
+			// ft_exec_cmd(path, argv[process + 2]);
+			// free(path);
+			char **wc_argss = ft_split(argv[process + 2], ' ');
+			execve(path, wc_argss, NULL);
+			free(wc_argss);
 		}
 		else
 		{
 			close(pipe_fd[process * 2 + 1]); // write end of the pipe
 			wait(NULL);
 		}
-		ft_putnbr_fd(process, 1);
+		//ft_putnbr_fd(process, 1);
 		process++;
 	}
 }
