@@ -6,7 +6,7 @@
 /*   By: aldokezer <aldokezer@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:22:40 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/26 00:52:45 by aldokezer        ###   ########.fr       */
+/*   Updated: 2023/11/26 17:40:06 by aldokezer        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,26 @@ int	ft_exec_cmd(char *path, char *cmd_arg)
 		return (free(commands), -1);
 	return (free(commands), 0);
 }
+
+// reads input from the fd1 and saves it to a file
+// call unlink to delete the file before the whole program exits
+void	ft_heredoc(char *limiter)
+{
+	char	*line;
+	int		heredoc_fd;
+
+	heredoc_fd = open(".heredoc", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	ft_putstr_fd("heredoc> ", 1);
+	line = ft_get_next_line(0);
+	while (ft_strncmp(line, limiter, ft_strlen(limiter) * sizeof(char)) != 0)
+	{ write(heredoc_fd, line, ft_strlen(line) * sizeof(char));
+		ft_putstr_fd("heredoc> ", 1);
+		free(line);
+		line = ft_get_next_line(0);
+	}
+	close(heredoc_fd);
+}
+
 
 int	main(int argc, char *argv[], char *envp[])
 {
