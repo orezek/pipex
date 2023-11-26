@@ -6,7 +6,7 @@
 /*   By: aldokezer <aldokezer@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:22:40 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/26 00:28:13 by aldokezer        ###   ########.fr       */
+/*   Updated: 2023/11/26 00:52:45 by aldokezer        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,18 +146,17 @@ int	main(int argc, char *argv[], char *envp[])
 			close(output_fd);
 			close(input_fd);
 			char *path = ft_get_command_path(envp, argv[process + 2]);
-			// ft_exec_cmd(path, argv[process + 2]);
-			// free(path);
-			char **wc_argss = ft_split(argv[process + 2], ' ');
-			execve(path, wc_argss, NULL);
-			free(wc_argss);
+			ft_exec_cmd(path, argv[process + 2]);
+			free(path);
+			// char **wc_argss = ft_split(argv[process + 2], ' ');
+			// execve(path, wc_argss, NULL);
+			// free(wc_argss);
 		}
 		else
 		{
 			close(pipe_fd[process * 2 + 1]); // write end of the pipe
 			wait(NULL);
 		}
-		//ft_putnbr_fd(process, 1);
 		process++;
 	}
 }
