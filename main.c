@@ -6,13 +6,10 @@
 /*   By: aldokezer <aldokezer@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:22:40 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/27 14:34:44 by aldokezer        ###   ########.fr       */
+/*   Updated: 2023/11/27 15:55:44 by aldokezer        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-
-// the commands are harcoded for now and the program will output from the file1 to file2
-// through 1 cat command and 2 wc command
 #include "pipex.h"
 
 int	ft_is_file_valid(const char *filename)
@@ -33,6 +30,7 @@ void ft_print_from_fd(int fd)
 	}
 }
 
+// get PATH string from env variables
 char	**ft_get_paths(char *envp[])
 {
 	int		i = 0;
@@ -81,25 +79,46 @@ int	ft_exec_cmd(char *path, char *cmd_arg)
 	return (free(commands), 0);
 }
 
-// reads input from the fd1 and saves it to a file
-// call unlink to delete the file before the whole program exits
-void	ft_heredoc(char *limiter)
+// read heredoc and save the text to a temp file
+void	ft_read_heredoc(char *limiter)
 {
 	char	*line;
 	int		heredoc_fd;
 
 	heredoc_fd = open("here_doc", O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	ft_putstr_fd("heredoc> ", 1);
-	line = ft_get_next_line(0);
+	ft_putstr_fd("heredoc> ", STDOUT_FILENO);
+	line = ft_get_next_line(STDIN_FILENO);
 	while (ft_strncmp(line, limiter, ft_strlen(limiter) * sizeof(char)) != 0)
-	{ write(heredoc_fd, line, ft_strlen(line) * sizeof(char));
-		ft_putstr_fd("heredoc> ", 1);
+	{
+		write(heredoc_fd, line, ft_strlen(line) * sizeof(char));
+		ft_putstr_fd("heredoc> ", STDOUT_FILENO);
 		free(line);
-		line = ft_get_next_line(0);
+		line = ft_get_next_line(STDIN_FILENO);
 	}
 	close(heredoc_fd);
 }
 
+int	ft_create_io_fd(char *argv[], int argc, int *is_heredoc, int *input_fd, int *output_fd)
+{
+	if (ft_strncmp(argv[1], "here_doc", ft_strlen("here_doc")) == 0)
+	{
+		*is_heredoc = 1;
+		ft_read_heredoc(argv[2]);
+		*input_fd = open(argv[1], O_RDONLY);
+		*output_fd = open(argv[argc - 1], O_WRONLY | O_CREAT | O_APPEND , 0644);
+		if (*output_fd == -1 || *input_fd == -1)
+			return (perror("heredoc file open"), 1);
+	}
+	else
+	{
+		*is_heredoc = 0;
+		*input_fd = open(argv[1], O_RDONLY);
+		*output_fd = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		if (*output_fd == -1 || *input_fd == -1)
+			return (perror("input file open"), 1);
+	}
+	return (0);
+}
 
 int	main(int argc, char *argv[], char *envp[])
 {
@@ -117,7 +136,6 @@ int	main(int argc, char *argv[], char *envp[])
 	// 	ft_putstr_fd("Usage: ./pipex file1 cmd1 cmd2 cmdn file2", 2);
 	// 	return (1);
 	// }
-	is_heredoc = 0;
 
 // // file check of the first argument
 // 	if (!ft_is_file_valid(argv[1]))
@@ -127,22 +145,8 @@ int	main(int argc, char *argv[], char *envp[])
 // 		ft_putstr_fd("\n", 2);
 // 		return (1);
 // 	}
-// create input and output file descriptors
-	if (ft_strncmp(argv[1], "here_doc", ft_strlen("here_doc")) == 0)
-	{
-		is_heredoc = 1;
-		ft_heredoc(argv[2]);
-		input_fd = open(argv[1], O_RDONLY);
-		output_fd = open(argv[argc - 1], O_WRONLY | O_CREAT | O_APPEND , 0644);
-	}
-	else
-	{
-		input_fd = open(argv[1], O_RDONLY);
-		output_fd = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
-		if (output_fd == -1)
-			return (1);
-	}
-
+	if (ft_create_io_fd(argv, argc, &is_heredoc, &input_fd, &output_fd))
+		return (1);
 	no_of_commands = argc - (3 + is_heredoc);
 // create pipes for each command
 	int i = 0;
