@@ -6,7 +6,7 @@
 /*   By: aldokezer <aldokezer@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:22:40 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/27 23:05:02 by aldokezer        ###   ########.fr       */
+/*   Updated: 2023/11/27 23:16:54 by aldokezer        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -200,7 +200,7 @@ int	ft_is_heredoc(char *argv[])
 
 int	ft_no_of_commands(int argc, char *argv[])
 {
-	return argc - (3 + ft_is_heredoc(argv));
+	return (argc - (3 + ft_is_heredoc(argv)));
 }
 
 int	main(int argc, char *argv[], char *envp[])
@@ -214,7 +214,7 @@ int	main(int argc, char *argv[], char *envp[])
 	pipe_fd = ft_create_pipes(ft_no_of_commands(argc, argv));
 	ft_create_io_fd(argv, argc, &input_fd, &output_fd);
 	process = 0;
-	while(process < ft_no_of_commands(argc, argv))
+	while (process < ft_no_of_commands(argc, argv))
 	{
 		pid = fork();
 		if (pid == -1)
