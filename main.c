@@ -6,7 +6,7 @@
 /*   By: aldokezer <aldokezer@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:22:40 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/27 23:16:54 by aldokezer        ###   ########.fr       */
+/*   Updated: 2023/11/27 23:40:46 by aldokezer        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -203,6 +203,17 @@ int	ft_no_of_commands(int argc, char *argv[])
 	return (argc - (3 + ft_is_heredoc(argv)));
 }
 
+int	ft_process(int *process, int no_of_commands)
+{
+	int	static s_process;
+
+	*process = s_process;
+	if (s_process < no_of_commands)
+		return (s_process++, 1);
+	else
+		return (0);
+}
+
 int	main(int argc, char *argv[], char *envp[])
 {
 	int	input_fd;
@@ -213,8 +224,8 @@ int	main(int argc, char *argv[], char *envp[])
 
 	pipe_fd = ft_create_pipes(ft_no_of_commands(argc, argv));
 	ft_create_io_fd(argv, argc, &input_fd, &output_fd);
-	process = 0;
-	while (process < ft_no_of_commands(argc, argv))
+	//process = 0;
+	while (ft_process(&process, ft_no_of_commands(argc, argv)))
 	{
 		pid = fork();
 		if (pid == -1)
@@ -230,7 +241,7 @@ int	main(int argc, char *argv[], char *envp[])
 			close(pipe_fd[process * 2 + 1]);
 			wait(NULL);
 		}
-		process++;
+		//process++;
 	}
 	return (free(pipe_fd), unlink("here_doc"), 0);
 }
