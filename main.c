@@ -6,11 +6,27 @@
 /*   By: aldokezer <aldokezer@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:22:40 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/27 21:16:14 by aldokezer        ###   ########.fr       */
+/*   Updated: 2023/11/27 23:05:02 by aldokezer        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
+
+// argument check
+	// if (argc != 6)
+	// {
+	// 	ft_putstr_fd("Usage: ./pipex file1 cmd1 cmd2 cmdn file2", 2);
+	// 	return (1);
+	// }
+
+// // file check of the first argument
+// 	if (!ft_is_file_valid(argv[1]))
+// 	{
+// 		ft_putstr_fd("pipex: no such file or directory: ", 2);
+// 		ft_putstr_fd(argv[1], 2);
+// 		ft_putstr_fd("\n", 2);
+// 		return (1);
+// 	}
 
 int	ft_is_file_valid(const char *filename)
 {
@@ -99,12 +115,11 @@ void	ft_read_heredoc(char *limiter)
 	}
 	close(heredoc_fd);
 }
-// create input and output files
-int	ft_create_io_fd(char *argv[], int argc, int *is_heredoc, int *input_fd, int *output_fd)
+
+int	ft_create_io_fd(char *argv[], int argc, int *input_fd, int *output_fd)
 {
 	if (ft_strncmp(argv[1], "here_doc", ft_strlen("here_doc")) == 0)
 	{
-		*is_heredoc = 1;
 		ft_read_heredoc(argv[2]);
 		*input_fd = open(argv[1], O_RDONLY);
 		*output_fd = open(argv[argc - 1], O_WRONLY | O_CREAT | O_APPEND , 0644);
@@ -113,7 +128,6 @@ int	ft_create_io_fd(char *argv[], int argc, int *is_heredoc, int *input_fd, int 
 	}
 	else
 	{
-		*is_heredoc = 0;
 		*input_fd = open(argv[1], O_RDONLY);
 		*output_fd = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		if (*output_fd == -1 || *input_fd == -1)
@@ -137,8 +151,9 @@ void	ft_close_fd(int *pipe_fd, int input_fd, int output_fd, int no_of_commands)
 		}
 	}
 	if (close(output_fd) == -1 || close(input_fd) == -1)
-		perror("fd");
+		perror("ft_close_fd");
 }
+
 int	*ft_create_pipes(int no_of_commands)
 {
 	int *pipe_fd;
@@ -156,60 +171,59 @@ int	*ft_create_pipes(int no_of_commands)
 	return (pipe_fd);
 }
 
+void	ft_redirect_pipes(int input_fd, int output_fd, int process, int *pipe_fd, int no_of_commands)
+{
+	if (process == 0)
+	{
+		dup2(input_fd, STDIN_FILENO);
+		dup2(pipe_fd[process * 2 + 1], STDOUT_FILENO);
+	}
+	else if (process > 0 && process < no_of_commands - 1)
+	{
+		dup2(pipe_fd[process * 2 - 2], STDIN_FILENO);
+		dup2(pipe_fd[process * 2 + 1], STDOUT_FILENO);
+	}
+	else if (process == no_of_commands - 1)
+	{
+		dup2(pipe_fd[process * 2 - 2], STDIN_FILENO);
+		dup2(output_fd, STDOUT_FILENO);
+	}
+}
+
+int	ft_is_heredoc(char *argv[])
+{
+	if (ft_strncmp(argv[1], "here_doc", ft_strlen("here_doc")) == 0)
+		return (1);
+	else
+		return (0);
+}
+
+int	ft_no_of_commands(int argc, char *argv[])
+{
+	return argc - (3 + ft_is_heredoc(argv));
+}
+
 int	main(int argc, char *argv[], char *envp[])
 {
 	int	input_fd;
 	int	output_fd;
-	int	no_of_commands;
-	int	is_heredoc;
 	int	pid;
 	int	process;
 	int	*pipe_fd;
-// argument check
-	// if (argc != 6)
-	// {
-	// 	ft_putstr_fd("Usage: ./pipex file1 cmd1 cmd2 cmdn file2", 2);
-	// 	return (1);
-	// }
 
-// // file check of the first argument
-// 	if (!ft_is_file_valid(argv[1]))
-// 	{
-// 		ft_putstr_fd("pipex: no such file or directory: ", 2);
-// 		ft_putstr_fd(argv[1], 2);
-// 		ft_putstr_fd("\n", 2);
-// 		return (1);
-// 	}
-	if (ft_create_io_fd(argv, argc, &is_heredoc, &input_fd, &output_fd) == -1)
-		return (1);
-	no_of_commands = argc - (3 + is_heredoc);
-// create pipes for each command
-	pipe_fd = ft_create_pipes(no_of_commands);
+	pipe_fd = ft_create_pipes(ft_no_of_commands(argc, argv));
+	ft_create_io_fd(argv, argc, &input_fd, &output_fd);
 	process = 0;
-	while(process < no_of_commands)
+	while(process < ft_no_of_commands(argc, argv))
 	{
 		pid = fork();
 		if (pid == -1)
 			return (1);
 		if (pid == 0)
 		{
-			if (process == 0)
-			{
-				dup2(input_fd, STDIN_FILENO);
-				dup2(pipe_fd[process * 2 + 1], STDOUT_FILENO);
-			}
-			if (process > 0 && process < no_of_commands - 1)
-			{
-				dup2(pipe_fd[process * 2 - 2], STDIN_FILENO);
-				dup2(pipe_fd[process * 2 + 1], STDOUT_FILENO);
-			}
-			if (process == no_of_commands - 1)
-			{
-				dup2(pipe_fd[process * 2 - 2], STDIN_FILENO);
-				dup2(output_fd, STDOUT_FILENO);
-			}
-			ft_close_fd(pipe_fd, input_fd, output_fd, no_of_commands);
-			ft_exec_cmd(envp, argv[process + (2 + is_heredoc)]);
+			ft_redirect_pipes(input_fd, output_fd, process, pipe_fd, ft_no_of_commands(argc, argv));
+			ft_close_fd(pipe_fd, input_fd, output_fd, ft_no_of_commands(argc, argv));
+			ft_exec_cmd(envp, argv[process + (2 + ft_is_heredoc(argv))]);
 		}
 		else
 		{
