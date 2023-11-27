@@ -6,7 +6,7 @@
 /*   By: aldokezer <aldokezer@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:22:40 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/27 15:55:44 by aldokezer        ###   ########.fr       */
+/*   Updated: 2023/11/27 20:22:59 by aldokezer        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,7 @@ void	ft_read_heredoc(char *limiter)
 	}
 	close(heredoc_fd);
 }
-
+// create input and output files
 int	ft_create_io_fd(char *argv[], int argc, int *is_heredoc, int *input_fd, int *output_fd)
 {
 	if (ft_strncmp(argv[1], "here_doc", ft_strlen("here_doc")) == 0)
@@ -120,16 +120,32 @@ int	ft_create_io_fd(char *argv[], int argc, int *is_heredoc, int *input_fd, int 
 	return (0);
 }
 
+void	ft_close_fd(int *pipe_fd, int input_fd, int output_fd, int no_of_commands)
+{
+	int	i;
+
+	i = 0;
+	while (i < 2 * no_of_commands)
+	{
+		if (close(pipe_fd[i++]) == -1)
+		{
+			//perror("while");
+			ft_putnbr_fd(pipe_fd[i - 1], 2); // prints FD that are already closed
+			ft_putchar_fd('\n', 2);
+		}
+	}
+	if (close(output_fd) == -1 || close(input_fd) == -1)
+		perror("fd");
+}
+
 int	main(int argc, char *argv[], char *envp[])
 {
 	int	input_fd;
 	int	output_fd;
 	int	no_of_commands;
-	int	pipe_fd[2 * (argc - 3)];
+	int	is_heredoc;
 	int	pid;
 	int	process;
-	int	is_heredoc;
-
 // argument check
 	// if (argc != 6)
 	// {
@@ -149,13 +165,14 @@ int	main(int argc, char *argv[], char *envp[])
 		return (1);
 	no_of_commands = argc - (3 + is_heredoc);
 // create pipes for each command
+	int	pipe_fd[2 * (argc - (3 + is_heredoc))];
 	int i = 0;
 	while (i < no_of_commands)
 	{
 		if (pipe(pipe_fd + (i++ * 2)) == -1)
 			return (1);
 	}
-
+	
 	process = 0;
 	while(process < no_of_commands)
 	{
@@ -179,17 +196,14 @@ int	main(int argc, char *argv[], char *envp[])
 				dup2(pipe_fd[process * 2 - 2], STDIN_FILENO);
 				dup2(output_fd, STDOUT_FILENO);
 			}
-			int i = 0;
-			while (i < 2 * no_of_commands)
-				close(pipe_fd[i++]);// close all pipes
-			close(output_fd);
-			close(input_fd);
+			ft_close_fd(pipe_fd, input_fd, output_fd, no_of_commands);
 			char *path = ft_get_command_path(envp, argv[process + (2 + is_heredoc)]);
 			ft_exec_cmd(path, argv[process + (2 + is_heredoc)]);
 			free(path);
 		}
 		else
 		{
+			//ft_printf("Parent: %i\n", pipe_fd[process * 2 + 1]); // prints fd that will be closed
 			close(pipe_fd[process * 2 + 1]);
 			wait(NULL);
 		}
