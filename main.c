@@ -6,7 +6,7 @@
 /*   By: aldokezer <aldokezer@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:22:40 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/27 20:22:59 by aldokezer        ###   ########.fr       */
+/*   Updated: 2023/11/27 21:16:14 by aldokezer        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,14 +69,16 @@ char	*ft_get_command_path(char *envp[], char *cmd_arg)
 }
 
 // Execute process
-int	ft_exec_cmd(char *path, char *cmd_arg)
+int	ft_exec_cmd(char *envp[], char *cmd_arg)
 {
 	char	**commands;
+	char	*path;
 
+	path = ft_get_command_path(envp, cmd_arg);
 	commands = ft_split(cmd_arg, ' ');
 	if (execve(path, commands, NULL) == -1)
-		return (free(commands), -1);
-	return (free(commands), 0);
+		return (free(path), free(commands), -1);
+	return (free(path), free(commands), 0);
 }
 
 // read heredoc and save the text to a temp file
@@ -107,7 +109,7 @@ int	ft_create_io_fd(char *argv[], int argc, int *is_heredoc, int *input_fd, int 
 		*input_fd = open(argv[1], O_RDONLY);
 		*output_fd = open(argv[argc - 1], O_WRONLY | O_CREAT | O_APPEND , 0644);
 		if (*output_fd == -1 || *input_fd == -1)
-			return (perror("heredoc file open"), 1);
+			return (perror("heredoc file open"), -1);
 	}
 	else
 	{
@@ -115,7 +117,7 @@ int	ft_create_io_fd(char *argv[], int argc, int *is_heredoc, int *input_fd, int 
 		*input_fd = open(argv[1], O_RDONLY);
 		*output_fd = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		if (*output_fd == -1 || *input_fd == -1)
-			return (perror("input file open"), 1);
+			return (perror("input file open"), -1);
 	}
 	return (0);
 }
@@ -130,12 +132,28 @@ void	ft_close_fd(int *pipe_fd, int input_fd, int output_fd, int no_of_commands)
 		if (close(pipe_fd[i++]) == -1)
 		{
 			//perror("while");
-			ft_putnbr_fd(pipe_fd[i - 1], 2); // prints FD that are already closed
-			ft_putchar_fd('\n', 2);
+			//ft_putnbr_fd(pipe_fd[i - 1], 2); // prints FD that are already closed
+			//ft_putchar_fd('\n', 2);
 		}
 	}
 	if (close(output_fd) == -1 || close(input_fd) == -1)
 		perror("fd");
+}
+int	*ft_create_pipes(int no_of_commands)
+{
+	int *pipe_fd;
+	int i;
+
+	pipe_fd = malloc((2 * no_of_commands) * sizeof(int));
+	if (!pipe_fd)
+		return (perror("malloc for pipes array"), NULL);
+	i = 0;
+	while (i < no_of_commands)
+	{
+		if (pipe(pipe_fd + (i++ * 2)) == -1)
+			return (perror("create pipes"), NULL);
+	}
+	return (pipe_fd);
 }
 
 int	main(int argc, char *argv[], char *envp[])
@@ -146,6 +164,7 @@ int	main(int argc, char *argv[], char *envp[])
 	int	is_heredoc;
 	int	pid;
 	int	process;
+	int	*pipe_fd;
 // argument check
 	// if (argc != 6)
 	// {
@@ -161,18 +180,11 @@ int	main(int argc, char *argv[], char *envp[])
 // 		ft_putstr_fd("\n", 2);
 // 		return (1);
 // 	}
-	if (ft_create_io_fd(argv, argc, &is_heredoc, &input_fd, &output_fd))
+	if (ft_create_io_fd(argv, argc, &is_heredoc, &input_fd, &output_fd) == -1)
 		return (1);
 	no_of_commands = argc - (3 + is_heredoc);
 // create pipes for each command
-	int	pipe_fd[2 * (argc - (3 + is_heredoc))];
-	int i = 0;
-	while (i < no_of_commands)
-	{
-		if (pipe(pipe_fd + (i++ * 2)) == -1)
-			return (1);
-	}
-	
+	pipe_fd = ft_create_pipes(no_of_commands);
 	process = 0;
 	while(process < no_of_commands)
 	{
@@ -197,17 +209,14 @@ int	main(int argc, char *argv[], char *envp[])
 				dup2(output_fd, STDOUT_FILENO);
 			}
 			ft_close_fd(pipe_fd, input_fd, output_fd, no_of_commands);
-			char *path = ft_get_command_path(envp, argv[process + (2 + is_heredoc)]);
-			ft_exec_cmd(path, argv[process + (2 + is_heredoc)]);
-			free(path);
+			ft_exec_cmd(envp, argv[process + (2 + is_heredoc)]);
 		}
 		else
 		{
-			//ft_printf("Parent: %i\n", pipe_fd[process * 2 + 1]); // prints fd that will be closed
 			close(pipe_fd[process * 2 + 1]);
 			wait(NULL);
 		}
 		process++;
 	}
-	return (unlink("here_doc"), 0);
+	return (free(pipe_fd), unlink("here_doc"), 0);
 }
