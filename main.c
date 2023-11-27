@@ -6,7 +6,7 @@
 /*   By: aldokezer <aldokezer@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:22:40 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/26 17:40:06 by aldokezer        ###   ########.fr       */
+/*   Updated: 2023/11/27 14:34:44 by aldokezer        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ void	ft_heredoc(char *limiter)
 	char	*line;
 	int		heredoc_fd;
 
-	heredoc_fd = open(".heredoc", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	heredoc_fd = open("here_doc", O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	ft_putstr_fd("heredoc> ", 1);
 	line = ft_get_next_line(0);
 	while (ft_strncmp(line, limiter, ft_strlen(limiter) * sizeof(char)) != 0)
@@ -107,8 +107,9 @@ int	main(int argc, char *argv[], char *envp[])
 	int	output_fd;
 	int	no_of_commands;
 	int	pipe_fd[2 * (argc - 3)];
-	int pid;
-	int process;
+	int	pid;
+	int	process;
+	int	is_heredoc;
 
 // argument check
 	// if (argc != 6)
@@ -116,7 +117,33 @@ int	main(int argc, char *argv[], char *envp[])
 	// 	ft_putstr_fd("Usage: ./pipex file1 cmd1 cmd2 cmdn file2", 2);
 	// 	return (1);
 	// }
-	no_of_commands = argc - 3;
+	is_heredoc = 0;
+
+// // file check of the first argument
+// 	if (!ft_is_file_valid(argv[1]))
+// 	{
+// 		ft_putstr_fd("pipex: no such file or directory: ", 2);
+// 		ft_putstr_fd(argv[1], 2);
+// 		ft_putstr_fd("\n", 2);
+// 		return (1);
+// 	}
+// create input and output file descriptors
+	if (ft_strncmp(argv[1], "here_doc", ft_strlen("here_doc")) == 0)
+	{
+		is_heredoc = 1;
+		ft_heredoc(argv[2]);
+		input_fd = open(argv[1], O_RDONLY);
+		output_fd = open(argv[argc - 1], O_WRONLY | O_CREAT | O_APPEND , 0644);
+	}
+	else
+	{
+		input_fd = open(argv[1], O_RDONLY);
+		output_fd = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		if (output_fd == -1)
+			return (1);
+	}
+
+	no_of_commands = argc - (3 + is_heredoc);
 // create pipes for each command
 	int i = 0;
 	while (i < no_of_commands)
@@ -124,19 +151,7 @@ int	main(int argc, char *argv[], char *envp[])
 		if (pipe(pipe_fd + (i++ * 2)) == -1)
 			return (1);
 	}
-// file check of the first argument
-	if (!ft_is_file_valid(argv[1]))
-	{
-		ft_putstr_fd("pipex: no such file or directory: ", 2);
-		ft_putstr_fd(argv[1], 2);
-		ft_putstr_fd("\n", 2);
-		return (1);
-	}
-// create input and output file descriptors
-	input_fd = open(argv[1], O_RDONLY);
-	output_fd = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (output_fd == -1)
-		return (1);
+
 	process = 0;
 	while(process < no_of_commands)
 	{
@@ -165,18 +180,16 @@ int	main(int argc, char *argv[], char *envp[])
 				close(pipe_fd[i++]);// close all pipes
 			close(output_fd);
 			close(input_fd);
-			char *path = ft_get_command_path(envp, argv[process + 2]);
-			ft_exec_cmd(path, argv[process + 2]);
+			char *path = ft_get_command_path(envp, argv[process + (2 + is_heredoc)]);
+			ft_exec_cmd(path, argv[process + (2 + is_heredoc)]);
 			free(path);
-			// char **wc_argss = ft_split(argv[process + 2], ' ');
-			// execve(path, wc_argss, NULL);
-			// free(wc_argss);
 		}
 		else
 		{
-			close(pipe_fd[process * 2 + 1]); // write end of the pipe
+			close(pipe_fd[process * 2 + 1]);
 			wait(NULL);
 		}
 		process++;
 	}
+	return (unlink("here_doc"), 0);
 }
