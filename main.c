@@ -6,7 +6,7 @@
 /*   By: aldokezer <aldokezer@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:22:40 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/28 14:06:15 by aldokezer        ###   ########.fr       */
+/*   Updated: 2023/11/28 14:57:39 by aldokezer        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,29 @@ int	ft_is_file_valid(const char *filename)
 	return (0);
 }
 
+int	ft_pip_strncmp(const char *s1, const char *s2, size_t size)
+{
+	unsigned char		start;
+	const unsigned char	*str1;
+	const unsigned char	*str2;
+
+	str1 = (const unsigned char *) s1;
+	str2 = (const unsigned char *) s2;
+	start = 0;
+	if (ft_strlen(s1) != ft_strlen(s2))
+		return (-1);
+	while (start < size)
+	{
+		if (*(str1 + start) == '\0' && *(str2 + start) == '\0')
+			break ;
+		else if (*(str1 + start) < *(str2 + start))
+			return (*(str1 + start) - *(str2 + start));
+		else if (*(str1 + start) > *(str2 + start))
+			return (*(str1 + start) - *(str2 + start));
+		start++;
+	}
+	return (0);
+}
 // get PATH string from env variables
 char	**ft_get_paths(char *envp[])
 {
@@ -86,28 +109,58 @@ int	ft_exec_cmd(char *envp[], char *cmd_arg)
 	return (free(path), free(commands), 0);
 }
 
+
+char *ft_sanitize_line(char *str)
+{
+	int	len;
+	char *new_line;
+	int	i;
+
+	if (str == NULL)
+		return NULL;
+
+	len = ft_strlen(str);
+	if (str[len - 1] == '\n')
+	{
+		new_line = malloc (len * sizeof(char));
+		i = 0;
+		while (i < len - 1)
+		{
+			new_line[i] = str[i];
+			i++;
+		}
+		new_line[i] = '\0';
+		return (new_line);
+	}
+	return (str);
+}
+
 // read heredoc and save the text to a temp file
 void	ft_read_heredoc(char *limiter)
 {
 	char	*line;
 	int		heredoc_fd;
+	char	*clean_line;
 
 	heredoc_fd = open("here_doc", O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	ft_putstr_fd("heredoc> ", STDOUT_FILENO);
 	line = ft_get_next_line(STDIN_FILENO);
-	while (ft_strncmp(line, limiter, ft_strlen(line) - 1) != 0)
+	clean_line = ft_sanitize_line(line);
+	while (ft_pip_strncmp(clean_line, limiter, ft_strlen(limiter)) != 0)
 	{
 		write(heredoc_fd, line, ft_strlen(line) * sizeof(char));
 		ft_putstr_fd("heredoc> ", STDOUT_FILENO);
 		free(line);
+		free(clean_line);
 		line = ft_get_next_line(STDIN_FILENO);
+		clean_line = ft_sanitize_line(line);
 	}
 	close(heredoc_fd);
 }
 
 int	ft_create_io_fd(char *argv[], int argc, int *input_fd, int *output_fd)
 {
-	if (ft_strncmp(argv[1], "here_doc", ft_strlen(argv[1])) == 0)
+	if (ft_pip_strncmp(argv[1], "here_doc", ft_strlen(argv[1])) == 0)
 	{
 		ft_read_heredoc(argv[2]);
 		*input_fd = open(argv[1], O_RDONLY);
@@ -181,7 +234,7 @@ void	ft_redirect_pipes(int input_fd, int output_fd, int process, int *pipe_fd, i
 
 int	ft_is_heredoc(char *argv[])
 {
-	if (ft_strncmp(argv[1], "here_doc", ft_strlen(argv[1])) == 0)
+	if (ft_pip_strncmp(argv[1], "here_doc", ft_strlen(argv[1])) == 0)
 		return (1);
 	else
 		return (0);
