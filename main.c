@@ -6,7 +6,7 @@
 /*   By: aldokezer <aldokezer@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:22:40 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/27 23:40:46 by aldokezer        ###   ########.fr       */
+/*   Updated: 2023/11/28 14:06:15 by aldokezer        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,17 +33,6 @@ int	ft_is_file_valid(const char *filename)
 	if (access(filename, R_OK) == 0)
 		return (1);
 	return (0);
-}
-
-void ft_print_from_fd(int fd)
-{
-	char buffer[1024];
-	ssize_t bytes_read;
-
-	while ((bytes_read = read(fd, buffer, sizeof(buffer))) > 0)
-	{
-		ft_putstr_fd(buffer, 1);
-	}
 }
 
 // get PATH string from env variables
@@ -106,7 +95,7 @@ void	ft_read_heredoc(char *limiter)
 	heredoc_fd = open("here_doc", O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	ft_putstr_fd("heredoc> ", STDOUT_FILENO);
 	line = ft_get_next_line(STDIN_FILENO);
-	while (ft_strncmp(line, limiter, ft_strlen(limiter) * sizeof(char)) != 0)
+	while (ft_strncmp(line, limiter, ft_strlen(line) - 1) != 0)
 	{
 		write(heredoc_fd, line, ft_strlen(line) * sizeof(char));
 		ft_putstr_fd("heredoc> ", STDOUT_FILENO);
@@ -118,7 +107,7 @@ void	ft_read_heredoc(char *limiter)
 
 int	ft_create_io_fd(char *argv[], int argc, int *input_fd, int *output_fd)
 {
-	if (ft_strncmp(argv[1], "here_doc", ft_strlen("here_doc")) == 0)
+	if (ft_strncmp(argv[1], "here_doc", ft_strlen(argv[1])) == 0)
 	{
 		ft_read_heredoc(argv[2]);
 		*input_fd = open(argv[1], O_RDONLY);
@@ -192,7 +181,7 @@ void	ft_redirect_pipes(int input_fd, int output_fd, int process, int *pipe_fd, i
 
 int	ft_is_heredoc(char *argv[])
 {
-	if (ft_strncmp(argv[1], "here_doc", ft_strlen("here_doc")) == 0)
+	if (ft_strncmp(argv[1], "here_doc", ft_strlen(argv[1])) == 0)
 		return (1);
 	else
 		return (0);
@@ -203,6 +192,7 @@ int	ft_no_of_commands(int argc, char *argv[])
 	return (argc - (3 + ft_is_heredoc(argv)));
 }
 
+// process interator - instead of variable I am using static variable to keep process iterations
 int	ft_process(int *process, int no_of_commands)
 {
 	int	static s_process;
@@ -214,6 +204,26 @@ int	ft_process(int *process, int no_of_commands)
 		return (0);
 }
 
+int	ft_check_args(int argc, char **argv, char **envp)
+{
+	int i;
+
+	i = 2;
+	if ((ft_is_heredoc(argv) && argc < 6) || (ft_is_file_valid(argv[1]) && argc < 5))
+		return (perror("not enough arguments"), 1);
+	if (!ft_is_heredoc(argv) && !ft_is_file_valid(argv[1]))
+			return (perror(argv[1]), 1);
+
+	if (ft_is_heredoc(argv))
+		i = 3;
+	while (i < argc - 1)
+	{
+		if (ft_get_command_path(envp, argv[i]) == NULL)
+			return (perror(argv[i]), 1);
+		i++;
+	}
+	return (0);
+}
 int	main(int argc, char *argv[], char *envp[])
 {
 	int	input_fd;
@@ -222,9 +232,10 @@ int	main(int argc, char *argv[], char *envp[])
 	int	process;
 	int	*pipe_fd;
 
+	if (ft_check_args(argc, argv, envp))
+		return (1);
 	pipe_fd = ft_create_pipes(ft_no_of_commands(argc, argv));
 	ft_create_io_fd(argv, argc, &input_fd, &output_fd);
-	//process = 0;
 	while (ft_process(&process, ft_no_of_commands(argc, argv)))
 	{
 		pid = fork();
@@ -241,7 +252,6 @@ int	main(int argc, char *argv[], char *envp[])
 			close(pipe_fd[process * 2 + 1]);
 			wait(NULL);
 		}
-		//process++;
 	}
 	return (free(pipe_fd), unlink("here_doc"), 0);
 }
