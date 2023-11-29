@@ -6,7 +6,7 @@
 /*   By: aldokezer <aldokezer@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:22:40 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/29 15:40:20 by aldokezer        ###   ########.fr       */
+/*   Updated: 2023/11/29 15:45:42 by aldokezer        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,28 +128,29 @@
 // 	return (str);
 // }
 
+// Done
 // read heredoc and save the text to a temp file
-void	ft_read_heredoc(char *limiter)
-{
-	char	*line;
-	int		heredoc_fd;
-	char	*clean_line;
+// void	ft_read_heredoc(char *limiter)
+// {
+// 	char	*line;
+// 	int		heredoc_fd;
+// 	char	*clean_line;
 
-	heredoc_fd = open("here_doc", O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	ft_putstr_fd("heredoc> ", STDOUT_FILENO);
-	line = ft_get_next_line(STDIN_FILENO);
-	clean_line = ft_sanitize_line(line);
-	while (ft_pip_strncmp(clean_line, limiter, ft_strlen(limiter)) != 0)
-	{
-		write(heredoc_fd, line, ft_strlen(line) * sizeof(char));
-		ft_putstr_fd("heredoc> ", STDOUT_FILENO);
-		free(line);
-		free(clean_line);
-		line = ft_get_next_line(STDIN_FILENO);
-		clean_line = ft_sanitize_line(line);
-	}
-	close(heredoc_fd);
-}
+// 	heredoc_fd = open("here_doc", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+// 	ft_putstr_fd("heredoc> ", STDOUT_FILENO);
+// 	line = ft_get_next_line(STDIN_FILENO);
+// 	clean_line = ft_sanitize_line(line);
+// 	while (ft_pip_strncmp(clean_line, limiter, ft_strlen(limiter)) != 0)
+// 	{
+// 		write(heredoc_fd, line, ft_strlen(line) * sizeof(char));
+// 		ft_putstr_fd("heredoc> ", STDOUT_FILENO);
+// 		free(line);
+// 		free(clean_line);
+// 		line = ft_get_next_line(STDIN_FILENO);
+// 		clean_line = ft_sanitize_line(line);
+// 	}
+// 	close(heredoc_fd);
+// }
 
 int	ft_create_io_fd(char *argv[], int argc, int *input_fd, int *output_fd)
 {
