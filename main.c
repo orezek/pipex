@@ -6,7 +6,7 @@
 /*   By: aldokezer <aldokezer@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:22:40 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/29 14:41:58 by aldokezer        ###   ########.fr       */
+/*   Updated: 2023/11/29 14:45:28 by aldokezer        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -231,17 +231,18 @@ int	ft_no_of_commands(int argc, char *argv[])
 	return (argc - (3 + ft_is_heredoc(argv)));
 }
 
+// Done
 // process interator - instead of variable I am using static variable to keep process iterations
-int	ft_process(int *process, int no_of_commands)
-{
-	int	static s_process;
+// int	ft_process(int *process, int no_of_commands)
+// {
+// 	int	static s_process;
 
-	*process = s_process;
-	if (s_process < no_of_commands)
-		return (s_process++, 1);
-	else
-		return (0);
-}
+// 	*process = s_process;
+// 	if (s_process < no_of_commands)
+// 		return (s_process++, 1);
+// 	else
+// 		return (0);
+// }
 
 //Done
 // int	ft_check_args(int argc, char **argv, char **envp)
