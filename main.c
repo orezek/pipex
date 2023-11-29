@@ -6,7 +6,7 @@
 /*   By: aldokezer <aldokezer@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:22:40 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/29 20:28:18 by aldokezer        ###   ########.fr       */
+/*   Updated: 2023/11/29 20:58:57 by aldokezer        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ int	main(int argc, char *argv[], char *envp[])
 			return (0);
 		}
 		close(pipe_fd[process * 2 + 1]);
+		pipe_fd[process * 2 + 1] = -1;
 		wait(NULL);
 	}
 	return (free(pipe_fd), free(io_fd), unlink("here_doc"), 0);
