@@ -6,7 +6,7 @@
 /*   By: aldokezer <aldokezer@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/29 15:48:08 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/29 19:59:47 by aldokezer        ###   ########.fr       */
+/*   Updated: 2023/11/29 20:10:01 by aldokezer        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 int	ft_create_io_fd(char *argv[], int argc, int **io_fd)
 {
-	*io_fd = malloc(2 *  sizeof(int));
+	*io_fd = malloc(2 * sizeof(int));
 	if (ft_pip_strncmp(argv[1], "here_doc", ft_strlen(argv[1])) == 0)
 	{
 		ft_read_heredoc(argv[2]);
