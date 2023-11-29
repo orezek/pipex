@@ -6,7 +6,7 @@
 /*   By: aldokezer <aldokezer@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:22:40 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/28 14:57:39 by aldokezer        ###   ########.fr       */
+/*   Updated: 2023/11/28 22:39:52 by aldokezer        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,8 +108,7 @@ int	ft_exec_cmd(char *envp[], char *cmd_arg)
 		return (free(path), free(commands), -1);
 	return (free(path), free(commands), 0);
 }
-
-
+// Sanitize line = remove the \n char
 char *ft_sanitize_line(char *str)
 {
 	int	len;
@@ -118,11 +117,12 @@ char *ft_sanitize_line(char *str)
 
 	if (str == NULL)
 		return NULL;
-
 	len = ft_strlen(str);
 	if (str[len - 1] == '\n')
 	{
 		new_line = malloc (len * sizeof(char));
+		if (!new_line)
+			return (NULL);
 		i = 0;
 		while (i < len - 1)
 		{
@@ -277,6 +277,7 @@ int	ft_check_args(int argc, char **argv, char **envp)
 	}
 	return (0);
 }
+
 int	main(int argc, char *argv[], char *envp[])
 {
 	int	input_fd;
