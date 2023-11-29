@@ -6,18 +6,19 @@
 /*   By: aldokezer <aldokezer@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:22:40 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/29 14:55:58 by aldokezer        ###   ########.fr       */
+/*   Updated: 2023/11/29 14:58:21 by aldokezer        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-int	ft_is_file_valid(const char *filename)
-{
-	if (access(filename, R_OK) == 0)
-		return (1);
-	return (0);
-}
+//Done
+// int	ft_is_file_valid(const char *filename)
+// {
+// 	if (access(filename, R_OK) == 0)
+// 		return (1);
+// 	return (0);
+// }
 
 int	ft_pip_strncmp(const char *s1, const char *s2, size_t size)
 {
@@ -227,6 +228,7 @@ void	ft_redir_pipes(int input_fd, int output_fd, int process, int *pipe_fd, int 
 // 		return (0);
 // }
 
+// Done
 // int	ft_no_of_commands(int argc, char *argv[])
 // {
 // 	return (argc - (3 + ft_is_heredoc(argv)));
