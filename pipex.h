@@ -6,7 +6,7 @@
 /*   By: orezek <orezek@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:23:54 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/29 11:43:15 by orezek           ###   ########.fr       */
+/*   Updated: 2023/11/29 12:03:25 by orezek           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ void	ft_cls_fd(int *pipe_fd, int input_fd, int output_fd, int no_of_cmds);
 int		*ft_create_pipes(int no_of_cmds);
 void	ft_redir_pipes(int input_fd, int output_fd, int process, int *pipe_fd, int no_of_cmds);
 int		ft_is_heredoc(char *argv[]);
+int		ft_no_of_commands(int argc, char *argv[]);
 int		ft_process(int *process, int no_of_cmds);
 int		ft_check_args(int argc, char **argv, char **envp);
 #endif
