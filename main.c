@@ -3,30 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aldokezer <aldokezer@student.42.fr>        +#+  +:+       +#+        */
+/*   By: orezek <orezek@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:22:40 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/28 14:57:39 by aldokezer        ###   ########.fr       */
+/*   Updated: 2023/11/29 11:41:40 by orezek           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-
-// argument check
-	// if (argc != 6)
-	// {
-	// 	ft_putstr_fd("Usage: ./pipex file1 cmd1 cmd2 cmdn file2", 2);
-	// 	return (1);
-	// }
-
-// // file check of the first argument
-// 	if (!ft_is_file_valid(argv[1]))
-// 	{
-// 		ft_putstr_fd("pipex: no such file or directory: ", 2);
-// 		ft_putstr_fd(argv[1], 2);
-// 		ft_putstr_fd("\n", 2);
-// 		return (1);
-// 	}
 
 int	ft_is_file_valid(const char *filename)
 {
@@ -178,7 +162,7 @@ int	ft_create_io_fd(char *argv[], int argc, int *input_fd, int *output_fd)
 	return (0);
 }
 
-void	ft_close_fd(int *pipe_fd, int input_fd, int output_fd, int no_of_commands)
+void	ft_cls_fd(int *pipe_fd, int input_fd, int output_fd, int no_of_commands)
 {
 	int	i;
 
@@ -193,7 +177,7 @@ void	ft_close_fd(int *pipe_fd, int input_fd, int output_fd, int no_of_commands)
 		}
 	}
 	if (close(output_fd) == -1 || close(input_fd) == -1)
-		perror("ft_close_fd");
+		perror("ft_cls_fd");
 }
 
 int	*ft_create_pipes(int no_of_commands)
@@ -213,7 +197,7 @@ int	*ft_create_pipes(int no_of_commands)
 	return (pipe_fd);
 }
 
-void	ft_redirect_pipes(int input_fd, int output_fd, int process, int *pipe_fd, int no_of_commands)
+void	ft_redir_pipes(int input_fd, int output_fd, int process, int *pipe_fd, int no_of_commands)
 {
 	if (process == 0)
 	{
@@ -296,8 +280,8 @@ int	main(int argc, char *argv[], char *envp[])
 			return (1);
 		if (pid == 0)
 		{
-			ft_redirect_pipes(input_fd, output_fd, process, pipe_fd, ft_no_of_commands(argc, argv));
-			ft_close_fd(pipe_fd, input_fd, output_fd, ft_no_of_commands(argc, argv));
+			ft_redir_pipes(input_fd, output_fd, process, pipe_fd, ft_no_of_commands(argc, argv));
+			ft_cls_fd(pipe_fd, input_fd, output_fd, ft_no_of_commands(argc, argv));
 			ft_exec_cmd(envp, argv[process + (2 + ft_is_heredoc(argv))]);
 		}
 		else
