@@ -6,7 +6,7 @@
 /*   By: aldokezer <aldokezer@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:22:40 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/29 15:30:24 by aldokezer        ###   ########.fr       */
+/*   Updated: 2023/11/29 15:40:20 by aldokezer        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,32 +99,34 @@
 // 		return (free(path), free(commands), -1);
 // 	return (free(path), free(commands), 0);
 // }
-// Sanitize line = remove the \n char
-char *ft_sanitize_line(char *str)
-{
-	int	len;
-	char *new_line;
-	int	i;
 
-	if (str == NULL)
-		return NULL;
-	len = ft_strlen(str);
-	if (str[len - 1] == '\n')
-	{
-		new_line = malloc (len * sizeof(char));
-		if (!new_line)
-			return (NULL);
-		i = 0;
-		while (i < len - 1)
-		{
-			new_line[i] = str[i];
-			i++;
-		}
-		new_line[i] = '\0';
-		return (new_line);
-	}
-	return (str);
-}
+//Done
+// Sanitize line = remove the \n char
+// char *ft_sanitize_line(char *str)
+// {
+// 	int	len;
+// 	char *new_line;
+// 	int	i;
+
+// 	if (str == NULL)
+// 		return NULL;
+// 	len = ft_strlen(str);
+// 	if (str[len - 1] == '\n')
+// 	{
+// 		new_line = malloc (len * sizeof(char));
+// 		if (!new_line)
+// 			return (NULL);
+// 		i = 0;
+// 		while (i < len - 1)
+// 		{
+// 			new_line[i] = str[i];
+// 			i++;
+// 		}
+// 		new_line[i] = '\0';
+// 		return (new_line);
+// 	}
+// 	return (str);
+// }
 
 // read heredoc and save the text to a temp file
 void	ft_read_heredoc(char *limiter)
