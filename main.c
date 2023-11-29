@@ -6,7 +6,7 @@
 /*   By: aldokezer <aldokezer@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:22:40 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/29 21:13:55 by aldokezer        ###   ########.fr       */
+/*   Updated: 2023/11/30 00:50:57 by aldokezer        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,12 +22,11 @@ int	main(int argc, char *argv[], char *envp[])
 	if (ft_check_args(argc, argv, envp))
 		return (1);
 	pipe_fd = ft_create_pipes(ft_no_cmd(argc, argv));
-	ft_create_io_fd(argv, argc, &io_fd);
+	if (ft_create_io_fd(argv, argc, &io_fd))
+		return (1);
 	while (ft_process(&ps, ft_no_cmd(argc, argv)))
 	{
 		pid = fork();
-		if (pid == -1)
-			return (1);
 		if (pid == 0)
 		{
 			ft_redir_pipes(io_fd, ps, pipe_fd, ft_no_cmd(argc, argv));
