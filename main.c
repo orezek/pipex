@@ -6,7 +6,7 @@
 /*   By: aldokezer <aldokezer@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:22:40 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/29 14:22:06 by aldokezer        ###   ########.fr       */
+/*   Updated: 2023/11/29 14:34:33 by aldokezer        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,40 +162,42 @@ int	ft_create_io_fd(char *argv[], int argc, int *input_fd, int *output_fd)
 	return (0);
 }
 
-void	ft_cls_fd(int *pipe_fd, int input_fd, int output_fd, int no_of_commands)
-{
-	int	i;
+//Done
+// void	ft_cls_fd(int *pipe_fd, int input_fd, int output_fd, int no_of_commands)
+// {
+// 	int	i;
 
-	i = 0;
-	while (i < 2 * no_of_commands)
-	{
-		if (close(pipe_fd[i++]) == -1)
-		{
-			//perror("while");
-			//ft_putnbr_fd(pipe_fd[i - 1], 2); // prints FD that are already closed
-			//ft_putchar_fd('\n', 2);
-		}
-	}
-	if (close(output_fd) == -1 || close(input_fd) == -1)
-		perror("ft_cls_fd");
-}
+// 	i = 0;
+// 	while (i < 2 * no_of_commands)
+// 	{
+// 		if (close(pipe_fd[i++]) == -1)
+// 		{
+// 			//perror("while");
+// 			//ft_putnbr_fd(pipe_fd[i - 1], 2); // prints FD that are already closed
+// 			//ft_putchar_fd('\n', 2);
+// 		}
+// 	}
+// 	if (close(output_fd) == -1 || close(input_fd) == -1)
+// 		perror("ft_cls_fd");
+// }
 
-int	*ft_create_pipes(int no_of_commands)
-{
-	int *pipe_fd;
-	int i;
+//Done
+// int	*ft_create_pipes(int no_of_commands)
+// {
+// 	int *pipe_fd;
+// 	int i;
 
-	pipe_fd = malloc((2 * no_of_commands) * sizeof(int));
-	if (!pipe_fd)
-		return (perror("malloc for pipes array"), NULL);
-	i = 0;
-	while (i < no_of_commands)
-	{
-		if (pipe(pipe_fd + (i++ * 2)) == -1)
-			return (perror("create pipes"), NULL);
-	}
-	return (pipe_fd);
-}
+// 	pipe_fd = malloc((2 * no_of_commands) * sizeof(int));
+// 	if (!pipe_fd)
+// 		return (perror("malloc for pipes array"), NULL);
+// 	i = 0;
+// 	while (i < no_of_commands)
+// 	{
+// 		if (pipe(pipe_fd + (i++ * 2)) == -1)
+// 			return (perror("create pipes"), NULL);
+// 	}
+// 	return (pipe_fd);
+// }
 
 void	ft_redir_pipes(int input_fd, int output_fd, int process, int *pipe_fd, int no_of_commands)
 {
