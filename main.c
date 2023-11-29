@@ -6,7 +6,7 @@
 /*   By: aldokezer <aldokezer@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:22:40 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/29 14:51:32 by aldokezer        ###   ########.fr       */
+/*   Updated: 2023/11/29 14:55:58 by aldokezer        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -227,10 +227,10 @@ void	ft_redir_pipes(int input_fd, int output_fd, int process, int *pipe_fd, int 
 // 		return (0);
 // }
 
-int	ft_no_of_commands(int argc, char *argv[])
-{
-	return (argc - (3 + ft_is_heredoc(argv)));
-}
+// int	ft_no_of_commands(int argc, char *argv[])
+// {
+// 	return (argc - (3 + ft_is_heredoc(argv)));
+// }
 
 // Done
 // process interator - instead of variable I am using static variable to keep process iterations
