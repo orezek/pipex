@@ -6,7 +6,7 @@
 /*   By: aldokezer <aldokezer@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:22:40 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/29 15:27:22 by aldokezer        ###   ########.fr       */
+/*   Updated: 2023/11/29 15:30:24 by aldokezer        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,18 +86,19 @@
 // 	return (free(ptr_paths), free(cmd_name), free(cmd_path), NULL);
 // }
 
+//Done
 // Execute process
-int	ft_exec_cmd(char *envp[], char *cmd_arg)
-{
-	char	**commands;
-	char	*path;
+// int	ft_exec_cmd(char *envp[], char *cmd_arg)
+// {
+// 	char	**commands;
+// 	char	*path;
 
-	path = ft_get_command_path(envp, cmd_arg);
-	commands = ft_split(cmd_arg, ' ');
-	if (execve(path, commands, NULL) == -1)
-		return (free(path), free(commands), -1);
-	return (free(path), free(commands), 0);
-}
+// 	path = ft_get_command_path(envp, cmd_arg);
+// 	commands = ft_split(cmd_arg, ' ');
+// 	if (execve(path, commands, NULL) == -1)
+// 		return (free(path), free(commands), -1);
+// 	return (free(path), free(commands), 0);
+// }
 // Sanitize line = remove the \n char
 char *ft_sanitize_line(char *str)
 {
