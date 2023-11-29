@@ -6,7 +6,7 @@
 /*   By: aldokezer <aldokezer@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:22:40 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/29 14:34:33 by aldokezer        ###   ########.fr       */
+/*   Updated: 2023/11/29 14:41:58 by aldokezer        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -243,26 +243,27 @@ int	ft_process(int *process, int no_of_commands)
 		return (0);
 }
 
-int	ft_check_args(int argc, char **argv, char **envp)
-{
-	int i;
+//Done
+// int	ft_check_args(int argc, char **argv, char **envp)
+// {
+// 	int i;
 
-	i = 2;
-	if ((ft_is_heredoc(argv) && argc < 6) || (ft_is_file_valid(argv[1]) && argc < 5))
-		return (perror("not enough arguments"), 1);
-	if (!ft_is_heredoc(argv) && !ft_is_file_valid(argv[1]))
-			return (perror(argv[1]), 1);
+// 	i = 2;
+// 	if ((ft_is_heredoc(argv) && argc < 6) || (ft_is_file_valid(argv[1]) && argc < 5))
+// 		return (perror("not enough arguments"), 1);
+// 	if (!ft_is_heredoc(argv) && !ft_is_file_valid(argv[1]))
+// 			return (perror(argv[1]), 1);
 
-	if (ft_is_heredoc(argv))
-		i = 3;
-	while (i < argc - 1)
-	{
-		if (ft_get_command_path(envp, argv[i]) == NULL)
-			return (perror(argv[i]), 1);
-		i++;
-	}
-	return (0);
-}
+// 	if (ft_is_heredoc(argv))
+// 		i = 3;
+// 	while (i < argc - 1)
+// 	{
+// 		if (ft_get_command_path(envp, argv[i]) == NULL)
+// 			return (perror(argv[i]), 1);
+// 		i++;
+// 	}
+// 	return (0);
+// }
 
 int	main(int argc, char *argv[], char *envp[])
 {
