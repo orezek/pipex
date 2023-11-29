@@ -6,7 +6,7 @@
 /*   By: aldokezer <aldokezer@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:23:54 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/29 20:46:32 by aldokezer        ###   ########.fr       */
+/*   Updated: 2023/11/29 21:09:16 by aldokezer        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ char	*ft_sanitize_line(char *str);
 void	ft_read_heredoc(char *limiter);
 // create an array of input and output FD for file manipulation
 int		ft_create_io_fd(char *argv[], int argc, int **io_fd);
-// clear fd after child process execution
+// close file descriptors after child process execution
 void	ft_cls_fd(int *pipe_fd, int *io_fd, int no_of_commands);
 // create an array of pipes for IPC
 int		*ft_create_pipes(int no_of_cmds);
