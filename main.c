@@ -6,7 +6,7 @@
 /*   By: aldokezer <aldokezer@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 15:22:40 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/29 15:12:27 by aldokezer        ###   ########.fr       */
+/*   Updated: 2023/11/29 15:19:59 by aldokezer        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,20 +44,23 @@
 // 	}
 // 	return (0);
 // }
-// get PATH string from env variables
-char	**ft_get_paths(char *envp[])
-{
-	int		i = 0;
-	char	*path;
 
-	while (envp[i] != NULL)
-	{
-		if (ft_strncmp(envp[i], "PATH=", 5) == 0)
-			path = envp[i] + 5;
-		i++;
-	}
-	return (ft_split(path, ':'));
-}
+//Done
+// get PATH string from env variables
+// char	**ft_get_paths(char *envp[])
+// {
+// 	int		i = 0;
+// 	char	*path;
+
+// 	while (envp[i] != NULL)
+// 	{
+// 		if (ft_strncmp(envp[i], "PATH=", 5) == 0)
+// 			path = envp[i] + 5;
+// 		i++;
+// 	}
+// 	return (ft_split(path, ':'));
+// }
+
 // return path to command if the command exists
 char	*ft_get_command_path(char *envp[], char *cmd_arg)
 {
