@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_check_args.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aldokezer <aldokezer@student.42.fr>        +#+  +:+       +#+        */
+/*   By: orezek <orezek@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/29 14:36:44 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/30 00:20:27 by aldokezer        ###   ########.fr       */
+/*   Updated: 2023/11/30 12:41:38 by orezek           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ int	ft_check_args(int argc, char **argv, char **envp)
 		return (perror(argv[0]), 1);
 	if ((ft_is_heredoc(argv) && argc < 6)
 		|| (ft_is_file_valid(argv[1]) && argc < 5))
-		return (perror("not enough arguments"), 1);
+		return (ft_putstr_fd("Error: not enough arguments", 2), 1);
 	if (!ft_is_heredoc(argv) && !ft_is_file_valid(argv[1]))
 		return (perror(argv[1]), 1);
 	if (ft_is_heredoc(argv))
