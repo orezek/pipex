@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_process.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aldokezer <aldokezer@student.42.fr>        +#+  +:+       +#+        */
+/*   By: orezek <orezek@student.42prague.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/29 14:43:23 by aldokezer         #+#    #+#             */
-/*   Updated: 2023/11/29 14:44:06 by aldokezer        ###   ########.fr       */
+/*   Updated: 2024/03/02 13:46:14 by orezek           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 int	ft_process(int *process, int no_of_commands)
 {
-	int static	s_process;
+	static int	s_process;
 
 	*process = s_process;
 	if (s_process < no_of_commands)
